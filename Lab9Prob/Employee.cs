@@ -11,8 +11,9 @@ namespace Lab9Prob
         public double Salary { get; set; }
         public Department Department { get; set; }
 
-        public override string ToString()
+        public string GetDepartmentName()
         {
-            return $"Name: {Name}, Id: {Id}, Salary: {Salary}, Department: {Department.Name}";
+            return Department.Name;
         }
     }
+}

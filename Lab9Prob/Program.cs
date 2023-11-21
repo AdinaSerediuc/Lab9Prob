@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Lab9Prob
 {
-    static void Main()
+    class Program
     {
-        List<Employee> employees = new List<Employee>
+        static void Main()
+        {
+            List<Employee> employees = new List<Employee>
         {
             new Employee { Name = "John Doe", Id = Guid.NewGuid(), Salary = 6000, Department = new Development() },
             new Employee { Name = "Jane Smith", Id = Guid.NewGuid(), Salary = 5500, Department = new Testing() },
@@ -15,69 +18,80 @@ namespace Lab9Prob
             new Employee { Name = "Charlie White", Id = Guid.NewGuid(), Salary = 5200, Department = new Logistics() },
         };
 
-        // noOfWellPayedEmployees
-        double salaryThreshold = 6000;
-        var wellPaidEmployees = employees.FindAll(e => e.Salary > salaryThreshold);
-        Console.WriteLine("Employees with salary greater than {0}:", salaryThreshold);
-        wellPaidEmployees.ForEach(Console.WriteLine);
+            // GetDepartmentName
+            var developmentEmployees = employees.Where(e => e.GetDepartmentName() == "Development");
+            Console.WriteLine("Employees in Development department:");
+            developmentEmployees.ToList().ForEach(Console.WriteLine);
 
-        // employeesFromMaintenance
-        var maintenanceEmployees = employees.FindAll(e => e.Department == "Maintenance");
-        Console.WriteLine("\nEmployees from Maintenance:");
-        maintenanceEmployees.ForEach(Console.WriteLine);
+            // noOfWellPayedEmployees
+            double salaryThreshold = 6000;
+            var wellPaidEmployees = employees.FindAll(e => e.Salary > salaryThreshold);
+            Console.WriteLine("Employees with salary greater than {0}:", salaryThreshold);
+            wellPaidEmployees.ForEach(Console.WriteLine);
 
-        // maxSalary
-        var maxSalaryEmployee = employees.OrderByDescending(e => e.Salary).FirstOrDefault();
-        Console.WriteLine("\nEmployee(s) with the highest salary:");
-        Console.WriteLine(maxSalaryEmployee);
+            // employeesFromMaintenance
+            var maintenanceEmployees = employees.Where(e => e.GetDepartmentName() == "Maintenance").ToList();
+            Console.WriteLine("\nEmployees from Maintenance:");
 
-        // maxSalaryForDevelopment
-        var maxSalaryDevelopmentEmployee = employees.Where(e => e.Department == "Development")
-                                                   .OrderByDescending(e => e.Salary)
-                                                   .FirstOrDefault();
-        Console.WriteLine("\nEmployee(s) with the highest salary in Development:");
-        Console.WriteLine(maxSalaryDevelopmentEmployee);
+            maintenanceEmployees.ForEach(Console.WriteLine);
 
-        // totalCost
-        double totalCost = employees.Sum(e => e.Salary);
-        Console.WriteLine("\nTotal cost of salaries in the company: {0}", totalCost);
+            // maxSalary
+            var maxSalaryEmployee = employees.OrderByDescending(e => e.Salary).FirstOrDefault();
+            Console.WriteLine("\nEmployee(s) with the highest salary:");
+            Console.WriteLine(maxSalaryEmployee);
 
-        // costForDepartment
-        string department = "Logistics";
-        double departmentCost = employees.Where(e => e.Department == department).Sum(e => e.Salary);
-        Console.WriteLine("\nTotal cost of salaries in {0} department: {1}", department, departmentCost);
+            // maxSalaryForDevelopment
+            var maxSalaryDevelopmentEmployee = employees.Where(e => e.GetDepartmentName() == "Development")
+                                                       .OrderByDescending(e => e.Salary)
+                                                       .FirstOrDefault();
+            Console.WriteLine("\nEmployee(s) with the highest salary in Development:");
+            Console.WriteLine(maxSalaryDevelopmentEmployee);
 
-        // IncreaseSalary
-        Guid employeeIdToIncrease = employees.First().Id;
-        var employeeToIncrease = employees.Find(e => e.Id == employeeIdToIncrease);
-        employeeToIncrease.Salary *= 1.25;
-        Console.WriteLine("\nSalary increased by 25% for employee with Id {0}:", employeeIdToIncrease);
-        Console.WriteLine(employeeToIncrease);
+            // totalCost
+            double totalCost = employees.Sum(e => e.Salary);
+            Console.WriteLine("\nTotal cost of salaries in the company: {0}", totalCost);
 
-        // IncreaseSalaryForTesting
-        double increasePercentage = 0.10;
-        employees.Where(e => e.Department == "Testing")
-                 .ToList()
-                 .ForEach(e => e.Salary *= (1 + increasePercentage));
-        Console.WriteLine("\nSalaries increased by {0}% for employees in Testing department:", increasePercentage * 100);
-        employees.Where(e => e.Department == "Testing").ForEach(Console.WriteLine);
+            // costForDepartment
+            string department = "Logistics";
+            double departmentCost = employees.Where(e => e.GetDepartmentName() == department).Sum(e => e.Salary);
+            Console.WriteLine("\nTotal cost of salaries in {0} department: {1}", department, departmentCost);
 
-        // Ordered HumanResources
-        var orderedHREmployees = employees.Where(e => e.Department == "HumanResources")
-                                         .OrderBy(e => e.Name)
-                                         .ThenByDescending(e => e.Salary);
-        Console.WriteLine("\nOrdered HumanResources employees (alphabetical and descending salary):");
-        orderedHREmployees.ForEach(Console.WriteLine);
+            // IncreaseSalary
+            Guid employeeIdToIncrease = employees.First().Id;
+            var employeeToIncrease = employees.Find(e => e.Id == employeeIdToIncrease);
+            employeeToIncrease.Salary *= 1.25;
+            Console.WriteLine("\nSalary increased by 25% for employee with Id {0}:", employeeIdToIncrease);
+            Console.WriteLine(employeeToIncrease);
 
-        // PoorestDevelopmentEmployee
-        var poorestDevelopmentEmployee = employees.Where(e => e.Department == "Development")
-                                                 .OrderBy(e => e.Salary)
-                                                 .FirstOrDefault();
-        Console.WriteLine("\nPoorest employee in Development department:");
-        Console.WriteLine(poorestDevelopmentEmployee);
+            // IncreaseSalaryForTesting
+            double increasePercentage = 0.10;
+            var testingEmployees = employees.Where(e => e.GetDepartmentName() == "Testing").ToList();
 
-        // LogisticsWithRangeExists
-        bool logisticsInRangeExists = employees.Any(e => e.Department == "Logistics" && e.Salary >= 5000 && e.Salary <= 6000);
-        Console.WriteLine("\nLogistics employees with salary in the range [5000, 6000] exist: {0}", logisticsInRangeExists);
+            Console.WriteLine("\nSalaries increased by {0}% for employees in Testing department:", increasePercentage * 100);
+
+            testingEmployees.ForEach(e => e.Salary *= (1 + increasePercentage));
+            testingEmployees.ForEach(Console.WriteLine);
+
+            // Ordered HumanResources
+            var orderedHREmployees = employees.Where(e => e.GetDepartmentName() == "HumanResources")
+                                             .OrderBy(e => e.Name)
+                                             .ThenByDescending(e => e.Salary)
+                                             .ToList();
+
+            Console.WriteLine("\nOrdered HumanResources employees (alphabetical and descending salary):");
+
+            orderedHREmployees.ForEach(Console.WriteLine);
+
+            // PoorestDevelopmentEmployee
+            var poorestDevelopmentEmployee = employees.Where(e => e.GetDepartmentName() == "Development")
+                                                     .OrderBy(e => e.Salary)
+                                                     .FirstOrDefault();
+            Console.WriteLine("\nPoorest employee in Development department:");
+            Console.WriteLine(poorestDevelopmentEmployee);
+
+            // LogisticsWithRangeExists
+            bool logisticsInRangeExists = employees.Any(e => e.GetDepartmentName() == "Logistics" && e.Salary >= 5000 && e.Salary <= 6000);
+            Console.WriteLine("\nLogistics employees with salary in the range [5000, 6000] exist: {0}", logisticsInRangeExists);
+        }
     }
 }
